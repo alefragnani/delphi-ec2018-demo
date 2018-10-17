@@ -1,0 +1,14 @@
+**/*.dcu
+**/*.~pas
+**/*.~dfm
+**/*.~dpr
+*.local
+*.identcache
+*.stat
+*.res
+node_modules
+__history
+__recovery
+Bin
+Lib
+Artifacts
