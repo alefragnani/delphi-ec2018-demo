@@ -24,20 +24,20 @@ shell.system("Project1Tests.exe", wd);
 shell.cd("..");
 
 // run code coverage
-// folder.create("Bin\\Coverage");
-// var cccomand = "\"Coverage\\CodeCoverage.exe\" -e \"Bin\\Project1Tests.exe\" -m \"Bin\\Project1Tests.map\" -sd \"src\" -u uCalculadora.pas -html -emma -xml -od \"Bin\\Coverage\"";
-// file.write("cc.bat", cccomand);
-// shell.system("cc.bat", wd);
+folder.create("Bin\\Coverage");
+var cccomand = "\"Coverage\\CodeCoverage.exe\" -e \"Bin\\Project1Tests.exe\" -m \"Bin\\Project1Tests.map\" -sd \"src\" -u uCalculadora.pas -html -emma -xml -od \"Bin\\Coverage\"";
+file.write("cc.bat", cccomand);
+shell.system("cc.bat", wd);
 
-// // copy artifacts
-// file.copy("Bin\\*.exe", "Artifacts");
-// file.copy("Bin\\dunit-report.xml", "Artifacts");
-// file.copy("Bin\\Coverage", "Artifacts\\Coverage");
+// copy artifacts
+file.copy("Bin\\*.exe", "Artifacts");
+file.copy("Bin\\dunitx-results.xml", "Artifacts");
+file.copy("Bin\\Coverage", "Artifacts\\Coverage");
 
-// // zip artifacts
-// zip.compress("Build.zip", "Artifacts", "*.*", true);
-// file.move("Build.zip", "Artifacts")
+// zip artifacts
+zip.compress("Build.zip", "Artifacts", "*.*", true);
+file.move("Build.zip", "Artifacts")
 
-// // clean up
-// file.remove("cc.bat");
-// file.remove("dunit-report.xml");
+// clean up
+file.remove("cc.bat");
+file.remove("Bin\\dunitx-results.xml");
