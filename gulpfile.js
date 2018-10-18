@@ -123,7 +123,7 @@ gulp.task("zip", function() {
 
 // watch
 gulp.task("watch", function() {
-  gulp.watch("src/*.*", ["build"]);
-  gulp.watch("tests/*.*", ["compile-tests"]);
-  gulp.watch("Artifacts/*.*", ["zip"]);
+  gulp.watch("src/*.pas", ["compile"]);
+  gulp.watch("tests/*.pas", ["unit-test"]);
+  // gulp.watch("Artifacts/*.*", ["zip"]);
 });
