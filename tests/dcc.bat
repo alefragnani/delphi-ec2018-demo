@@ -1,0 +1,1 @@
+"DCC32.EXE" Project1Tests.dpr -B -E..\Bin -NU..\Lib -U..\Lib;C:\\Users\\alefr\\Documents\\GitHub\\_forks\\DUnitX -GD -DCI

@@ -1,0 +1,1 @@
+"DCC32.EXE" Project1.dpr -B -E..\Bin -NU..\Lib -GD
