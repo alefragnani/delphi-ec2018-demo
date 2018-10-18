@@ -47,13 +47,25 @@ gulp.task("create-folders", function() {
   return gutil.log('create-folders:ended');
 });
 
+function create_dcc_bat(projectName, folderName, unitSources, conditionalDefines) {
+  var dcccomand = "DCC32.EXE " + projectName + " -B -E..\\Bin -NU..\\Lib -GD ";
+  // var dcccomand = "DCC32.EXE " + projectName + " -B -E..\\Bin -NU..\\Lib -U..\\Lib -GD ";
+
+  dcccomand = conditionalDefines ? dcccomand + " -D" + conditionalDefines : dcccomand;
+  dcccomand = unitSources ? dcccomand + " -U..\\Lib;" + unitSources : dcccomand + "-U..\\Lib";  
+  
+  fs.writeFileSync(path.join(__dirname, folderName, 'dccX.bat'), dcccomand);
+}
+
+
 // compile the main project
 gulp.task("compile", ["create-folders"], function() {
   gutil.log('compile-entrando-chdir');
   gutil.log(__dirname);
   pp.chdir(path.join(__dirname, "src"));
   gutil.log('compile-entrando-spawn');
-  var bb = cp.spawnSync(path.join(__dirname, 'src\\dcc.bat'));
+  create_dcc_bat('Project1.dpr', 'src');
+  var bb = cp.spawnSync(path.join(__dirname, 'src\\dccX.bat'));
   gutil.log(bb.output.toString());
   return gutil.log('COMPILE exit');
 });
@@ -64,7 +76,8 @@ gulp.task("compile-tests", ["compile"], function() {
   gutil.log(__dirname);
   pp.chdir(path.join(__dirname, "tests"));
   gutil.log('compile-tests-entrando-spawn');
-  var bb = cp.spawnSync(path.join(__dirname, 'tests\\dcc.bat'));
+  create_dcc_bat('Project1Tests.dpr', 'tests', 'C:\\Users\\alefr\\Documents\\GitHub\\_forks\\DUnitX', 'CI');
+  var bb = cp.spawnSync(path.join(__dirname, 'tests\\dccX.bat'));
   gutil.log(bb.output.toString());
   return gutil.log('COMPILE-TESTS exit');
 });
