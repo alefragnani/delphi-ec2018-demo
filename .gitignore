@@ -12,3 +12,7 @@ __recovery
 Bin
 Lib
 Artifacts
+*.fbpInf
+*.fbpbrk
+*.fbl8
+*.fb8lck
