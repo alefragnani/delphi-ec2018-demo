@@ -57,6 +57,22 @@ gulp.task("create-folders", function() {
 //   fs.writeFileSync(path.join(__dirname, folderName, 'dccX.bat'), dcccomand);
 // }
 
+function dccHasError(output) {
+  gutil.log("dccHasError: output - " + output);
+  gutil.log("dccHasError: output length - " + output.length);
+  // for  (var index = 0; index < output.length; index++) {
+  //   var currentLine = output[index];
+  //   gutil.log("currentLine: " + currentLine);
+    var re = RegExp(/.*(Fatal|Error).*/);
+    var matches = re.exec(output);
+    if (matches) {
+      gutil.log("acho erro:" + matches[1]);
+      return true;
+    } else {
+      return false;
+    }
+  // }
+}
 
 // compile the main project
 gulp.task("compile", ["create-folders"], function() {
@@ -68,6 +84,27 @@ gulp.task("compile", ["create-folders"], function() {
   // var bb = cp.spawnSync(path.join(__dirname, 'src\\dccX.bat'));
   var bb = cp.spawnSync("dcc32", ["-B", "Project1.dpr", "-E..\\Bin", "-nu..\\Lib", "-GD"]);
   gutil.log(bb.output.toString());
+  if (dccHasError(bb.output.toString())) {
+    gutil.log("achoooou");
+    process.exit(1);
+  }
+  // gutil.log("process.env -- ");
+  // gutil.log(process.env);
+  
+  // var bb = cp.spawn("dcc32", ["-B", "Project1.dpr", "-E..\\Bin", "-nu..\\Lib", "-GD"]);
+
+  // bb.stdout.on('data', (data) => {
+  //   console.log(`stdout: ${data}`);
+  // });
+  
+  // bb.stderr.on('data', (data) => {
+  //   console.log(`stderr: ${data}`);
+  // });
+  
+  // bb.on('close', (code) => {
+  //   console.log(`child process exited with code ${code}`);
+  // });
+
   // return gutil.log('COMPILE exit');
 });
 
