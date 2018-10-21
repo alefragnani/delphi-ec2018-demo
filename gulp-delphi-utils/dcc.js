@@ -1,10 +1,9 @@
 // module dcc.js
 
 var cp = require("child_process"),
-    gutil = require("gulp-util");//,
-    // path = require('path');
+    gutil = require("gulp-util");
 
-exports.dcc = function dcc(projectName, exeOuputDirectory, dcuOutputDirectory, unitDirectories, mapFile, defineConditionals) {
+function dcc(projectName, exeOuputDirectory, dcuOutputDirectory, unitDirectories, mapFile, defineConditionals) {
 
     var params = [];
     params.push("-B");
@@ -33,7 +32,7 @@ exports.dcc = function dcc(projectName, exeOuputDirectory, dcuOutputDirectory, u
     return bb.output.toString();
 }
 
-exports.dccHasError = function dccHasError(output) {
+function dccHasError(output) {
     var re = RegExp(/.*(Fatal|Error):.*/);
     var matches = re.exec(output);
     return matches;
@@ -43,3 +42,6 @@ exports.dccHasError = function dccHasError(output) {
   var dcc = require('./dcc');
   dcc("Project1Tests.dpr", "..\\Bin", "..\\Lib", "..\\Lib;C:\\Users\\alefr\\Documents\\GitHub\\_forks\\DUnitX", true, "CI");
 */
+
+module.exports = dcc;
+module.exports.dccHasError = dccHasError;
