@@ -8,6 +8,10 @@ var gulp  = require('gulp'),
     cp = require('child_process'),
     pp = require('process');
 
+var dcc = require('./gulp-delphi-utils/dcc');
+var codeCoverage = require('./gulp-delphi-utils/codeCoverage');
+
+
 // This will run in this order: 
 // * create-folders
 // * compile the main project
@@ -47,68 +51,37 @@ gulp.task("create-folders", function() {
   return gutil.log('create-folders:ended');
 });
 
-function create_dcc_bat(projectName, folderName, unitSources, conditionalDefines) {
-  var dcccomand = "DCC32.EXE " + projectName + " -B -E..\\Bin -NU..\\Lib -GD ";
-  // var dcccomand = "DCC32.EXE " + projectName + " -B -E..\\Bin -NU..\\Lib -U..\\Lib -GD ";
-
-  dcccomand = conditionalDefines ? dcccomand + " -D" + conditionalDefines : dcccomand;
-  dcccomand = unitSources ? dcccomand + " -U..\\Lib;" + unitSources : dcccomand + "-U..\\Lib";  
-  
-  fs.writeFileSync(path.join(__dirname, folderName, 'dccX.bat'), dcccomand);
-}
-
-
 // compile the main project
 gulp.task("compile", ["create-folders"], function() {
-  gutil.log('compile-entrando-chdir');
-  gutil.log(__dirname);
   pp.chdir(path.join(__dirname, "src"));
-  gutil.log('compile-entrando-spawn');
-  create_dcc_bat('Project1.dpr', 'src');
-  var bb = cp.spawnSync(path.join(__dirname, 'src\\dccX.bat'));
-  gutil.log(bb.output.toString());
-  return gutil.log('COMPILE exit');
+  var bb = dcc("Project1.dpr", "..\\Bin", "..\\Lib");
+  if (dcc.dccHasError(bb)) {
+    throw Error("Task: compile");
+  }
 });
 
 // compile the test project
 gulp.task("compile-tests", ["compile"], function() {
-  gutil.log('compile-tests-entrando-chdir');
-  gutil.log(__dirname);
   pp.chdir(path.join(__dirname, "tests"));
-  gutil.log('compile-tests-entrando-spawn');
-  create_dcc_bat('Project1Tests.dpr', 'tests', 'C:\\Users\\alefr\\Documents\\GitHub\\_forks\\DUnitX', 'CI');
-  var bb = cp.spawnSync(path.join(__dirname, 'tests\\dccX.bat'));
-  gutil.log(bb.output.toString());
-  return gutil.log('COMPILE-TESTS exit');
+  var bb = dcc("Project1Tests.dpr", "..\\Bin", "..\\Lib", 
+    "..\\Lib;C:\\Users\\alefr\\Documents\\GitHub\\_forks\\DUnitX",
+    "-GD", "CI")
+  if (dcc.dccHasError(bb)) {
+    throw Error("Task: compile-tests");
+  }
 });
 
 // run unit tests
 gulp.task("unit-test", ["compile-tests"], function() {
-  gutil.log('unit-test');
-  gutil.log(__dirname);
   pp.chdir(path.join(__dirname, "Bin"));
-  gutil.log('unit-test-spawn');
   var bb = cp.spawnSync(path.join(__dirname, 'Bin\\Project1Tests.exe'));
   gutil.log(bb.output.toString());
-  return gutil.log('UNIT-TEST exit');
 });
-
-function create_cc_bat(projectName, unitName) {
-  var ccexe = path.join(__dirname, "Coverage\\CodeCoverage.exe")
-  var cccomand = path.join(__dirname, "Coverage\\CodeCoverage.exe") + " -e " + path.join(__dirname, "Bin",  projectName + ".exe") + " -m " + path.join(__dirname, "Bin", projectName + ".map") + " -sd " + path.join(__dirname, "src") + " -u " + unitName + " -html -emma -xml -od " + path.join(__dirname, "Bin", "Coverage");
-  fs.writeFileSync(path.join(__dirname, 'Coverage\\ccX.bat'), cccomand);
-}
 
 // run code coverage
 gulp.task("code-coverage", function() {
-  gutil.log('code-coverage');
-  gutil.log(__dirname);
-  // pp.chdir(path.join(__dirname, "Bin"));
-  // gutil.log('code-coverage-spawn');
-  create_cc_bat('Project1Tests', 'uCalculadora.pas');
-  var bb = cp.spawnSync(path.join(__dirname, 'Coverage\\ccX.bat'));
-  gutil.log(bb.output.toString());
-  return gutil.log('code-coverage exit');
+  var bb = codeCoverage("Project1Tests", "src", "uCalculadora.pas", __dirname);
+  gutil.log(bb);
 });
 
 
@@ -117,13 +90,10 @@ gulp.task("zip", function() {
   return gulp.src('./Bin/**')
     .pipe(zip('Build.zip'))
     .pipe(gulp.dest('./Artifacts'));
-
-  return gutil.log('ZIP');
 });
 
 // watch
 gulp.task("watch", function() {
   gulp.watch("src/*.pas", ["compile"]);
   gulp.watch("tests/*.pas", ["unit-test"]);
-  // gulp.watch("Artifacts/*.*", ["zip"]);
 });
