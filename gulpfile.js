@@ -8,6 +8,9 @@ var gulp  = require('gulp'),
     cp = require('child_process'),
     pp = require('process');
 
+var dcc = require('./dcc');
+var codeCoverage = require('./codeCoverage');
+
 
 // This will run in this order: 
 // * create-folders
@@ -48,39 +51,36 @@ gulp.task("create-folders", function() {
   return gutil.log('create-folders:ended');
 });
 
-function dccHasError(output) {
-  // gutil.log("dccHasError: output - " + output);
-  // gutil.log("dccHasError: output length - " + output.length);
-  var re = RegExp(/.*(Fatal|Error):.*/);
-  var matches = re.exec(output);
-  if (matches) {
-    // gutil.log("acho erro:" + matches[1]);
-    return true;
-  } else {
-    return false;
-  }
-}
-
 // compile the main project
 gulp.task("compile", ["create-folders"], function() {
   pp.chdir(path.join(__dirname, "src"));
-  var bb = cp.spawnSync("dcc32", ["-B", "Project1.dpr", "-E..\\Bin", "-nu..\\Lib", "-GD"]);
-  gutil.log(bb.output.toString());
-  if (dccHasError(bb.output.toString())) {
-    // process.exit(1);
-    throw Error("Task: compile-tests");
+  //var bb = cp.spawnSync("dcc32", ["-B", "Project1.dpr", "-E..\\Bin", "-nu..\\Lib", "-GD"]);
+  // gutil.log(bb.output.toString());
+  // if (dccHasError(bb.output.toString())) {
+  //   // process.exit(1);
+  //   throw Error("Task: compile-tests");
+  // }
+  var bb = dcc.dcc("Project1.dpr", "..\\Bin", "..\\Lib");
+  if (dcc.dccHasError(bb)) {
+    throw Error("Task: compile");
   }
 });
 
 // compile the test project
 gulp.task("compile-tests", ["compile"], function() {
   pp.chdir(path.join(__dirname, "tests"));
-  var bb = cp.spawnSync("dcc32", ["-B", "Project1Tests.dpr", 
-    "-E..\\Bin", "-NU..\\Lib", "-U..\\Lib;C:\\Users\\alefr\\Documents\\GitHub\\_forks\\DUnitX", 
-    "-GD", "-DCI"]);
-  gutil.log(bb.output.toString());
-  if (dccHasError(bb.output.toString())) {
-     //process.exit(1);
+  // var bb = cp.spawnSync("dcc32", ["-B", "Project1Tests.dpr", 
+  //   "-E..\\Bin", "-NU..\\Lib", "-U..\\Lib;C:\\Users\\alefr\\Documents\\GitHub\\_forks\\DUnitX", 
+  //   "-GD", "-DCI"]);
+  // gutil.log(bb.output.toString());
+  // if (dccHasError(bb.output.toString())) {
+  //    //process.exit(1);
+  //   throw Error("Task: compile-tests");
+  // }
+  var bb = dcc.dcc("Project1Tests.dpr", "..\\Bin", "..\\Lib", 
+    "..\\Lib;C:\\Users\\alefr\\Documents\\GitHub\\_forks\\DUnitX",
+    "-GD", "CI")
+  if (dcc.dccHasError(bb)) {
     throw Error("Task: compile-tests");
   }
 });
@@ -95,15 +95,17 @@ gulp.task("unit-test", ["compile-tests"], function() {
 // run code coverage
 gulp.task("code-coverage", function() {
 
-  var bb = cp.spawnSync(path.join(__dirname, 'Coverage\\CodeCoverage.exe'), [
-    "-e",  path.join(__dirname, "Bin", "Project1Tests.exe"), 
-    "-m",  path.join(__dirname, "Bin", "Project1Tests.map"),
-    "-sd", path.join(__dirname, "src"),
-    "-u", "uCalculadora.pas",
-    "-html", "-emma", "-xml", 
-    "-od", path.join(__dirname, "Bin", "Coverage")   
-    ]);
-  gutil.log(bb.output.toString());
+  // var bb = cp.spawnSync(path.join(__dirname, 'Coverage\\CodeCoverage.exe'), [
+  //   "-e",  path.join(__dirname, "Bin", "Project1Tests.exe"), 
+  //   "-m",  path.join(__dirname, "Bin", "Project1Tests.map"),
+  //   "-sd", path.join(__dirname, "src"),
+  //   "-u", "uCalculadora.pas",
+  //   "-html", "-emma", "-xml", 
+  //   "-od", path.join(__dirname, "Bin", "Coverage")   
+  //   ]);
+  // gutil.log(bb.output.toString());
+  var bb = codeCoverage("Project1Tests", "src", "uCalculadora.pas");
+  gutil.log(bb);//.output.toString());
 });
 
 
