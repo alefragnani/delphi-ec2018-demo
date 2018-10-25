@@ -20,14 +20,6 @@ function dcc(projectName, exeOuputDirectory, dcuOutputDirectory, unitDirectories
         params.push("-D" + defineConditionals);
     }
     var bb = cp.spawnSync("dcc32", params);
-    // var bb = cp.spawnSync("dcc32", [
-    //     "-B", 
-    //     projectName,
-    //     "-E" + exeOuputDirectory, 
-    //     "-NU" + dcuOutputDirectory,
-    //     unitDirectories ? "-U" + unitDirectories : "", 
-    //     mapFile ? "-GD" : "",
-    //     defineConditionals ? "-D" + defineConditionals : ""]);
     gutil.log(bb.output.toString());
     return bb.output.toString();
 }

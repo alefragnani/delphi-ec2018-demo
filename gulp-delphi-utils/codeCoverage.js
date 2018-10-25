@@ -14,18 +14,6 @@ function codeCoverage(applicationName, sourceDirectory, sourceUnit, rootDirector
     gutil.log(bb.output.toString());    
     return bb.output.toString();
 }
-// function codeCoverage(applicationName, sourceDirectory, sourceUnit) {
-//     var bb = cp.spawnSync(path.join(__dirname, 'coverage\\CodeCoverage.exe'), [
-//         "-e",  path.join(__dirname, "Bin", applicationName + ".exe"), 
-//         "-m",  path.join(__dirname, "Bin", applicationName + ".map"),
-//         "-sd", path.join(__dirname, sourceDirectory),
-//         "-u", sourceUnit,
-//         "-html", "-emma", "-xml", 
-//         "-od", path.join(__dirname, "Bin", "Coverage")   
-//         ]);
-//     gutil.log(bb.output.toString());    
-//     return bb.output.toString();
-// }
 
 /*
   var codeCoverage = require("./codeCoverage");
